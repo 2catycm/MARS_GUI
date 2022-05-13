@@ -11,7 +11,9 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.io.*;
 import java.util.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.basic.*;
+import javax.swing.filechooser.FileFilter;
 	
 	/*
 Copyright (c) 2003-2008,  Pete Sanderson and Kenneth Vollmar
@@ -222,12 +224,19 @@ public class FileDumpMemoryAction extends GuiAction {
 
         saveDialog = new JFileChooser(mainUI.getEditor().getCurrentSaveDirectory());
         saveDialog.setDialogTitle(title);
+        FileFilter ff = new FileNameExtensionFilter(format.getFileExtension(), format.getFileExtension());
+        saveDialog.addChoosableFileFilter(ff);
+        saveDialog.setFileFilter(ff);
         while (!operationOK) {
             int decision = saveDialog.showSaveDialog(mainUI);
             if (decision != JFileChooser.APPROVE_OPTION) {
                 return false;
             }
             theFile = saveDialog.getSelectedFile();
+            String filePath = theFile.getPath();
+            if (!filePath.toLowerCase().endsWith("." + format.getFileExtension())) {
+                theFile = new File(filePath + "." + format.getFileExtension());
+            }
             operationOK = true;
             if (theFile.exists()) {
                 int overwrite = JOptionPane.showConfirmDialog(mainUI,

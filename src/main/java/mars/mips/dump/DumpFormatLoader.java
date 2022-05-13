@@ -73,7 +73,11 @@ public class DumpFormatLoader {
                     if (DumpFormat.class.isAssignableFrom(clas) &&
                             !Modifier.isAbstract(clas.getModifiers()) &&
                             !Modifier.isInterface(clas.getModifiers())) {
-                        formatList.add(clas.newInstance());
+                        if (formatClassName.equals("mars.mips.dump.COEHexDumpFormat")) {
+                            formatList.add(0, clas.newInstance());
+                        } else {
+                            formatList.add(clas.newInstance());
+                        }
                     }
                 } catch (Exception e) {
                     System.out.println("Error instantiating DumpFormat from file " + file + ": " + e);
