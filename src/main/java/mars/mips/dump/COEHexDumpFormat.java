@@ -50,7 +50,23 @@ public class COEHexDumpFormat extends AbstractDumpFormat {
                 string.append(',');
                 out.println(string);
             }
-            for (int i = lastAddress + Memory.WORD_LENGTH_BYTES; i < 32767 * Memory.WORD_LENGTH_BYTES; i += Memory.WORD_LENGTH_BYTES) {
+            for (int i = lastAddress + Memory.WORD_LENGTH_BYTES; i < Memory.kernelTextBaseAddress; i += Memory.WORD_LENGTH_BYTES) {
+                out.println("00000000,");
+            }
+            for (int i = Memory.kernelTextBaseAddress; i < Memory.kernelTextLimitAddress; i += Memory.WORD_LENGTH_BYTES) {
+                Integer temp = Globals.memory.getRawWordOrNull(i);
+                if (temp == null) {
+                    out.println("00000000,");
+                    continue;
+                }
+                StringBuilder string = new StringBuilder(Integer.toHexString(temp));
+                while (string.length() < 8) {
+                    string.insert(0, '0');
+                }
+                string.append(',');
+                out.println(string);
+            }
+            for (int i = Memory.kernelTextLimitAddress; i < 32767 * Memory.WORD_LENGTH_BYTES; i += Memory.WORD_LENGTH_BYTES) {
                 out.println("00000000,");
             }
             out.println("00000000;");
