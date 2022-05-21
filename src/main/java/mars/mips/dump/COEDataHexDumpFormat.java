@@ -10,9 +10,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-public class COEHexDumpFormat extends AbstractDumpFormat {
-    public COEHexDumpFormat() {
-        super("Vivado COE hex format", "HEX", "Written as Vivado COE Hex Memory File", "coe");
+public class COEDataHexDumpFormat extends AbstractDumpFormat {
+    public COEDataHexDumpFormat() {
+        super("Vivado COE data seg hex format", "HEX", "Written as Vivado COE Hex Memory File", "coe");
     }
 
     /**
@@ -32,8 +32,6 @@ public class COEHexDumpFormat extends AbstractDumpFormat {
         try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
 //            out.println("memory_initialization_radix = 16;");
 //            out.println("memory_initialization_vector =");
-            System.out.println(firstAddress);
-            System.out.println(lastAddress);
             for (int i = 0; i < firstAddress; i += Memory.WORD_LENGTH_BYTES) {
                 out.println("00000000");
             }
@@ -45,28 +43,12 @@ public class COEHexDumpFormat extends AbstractDumpFormat {
                 while (string.length() < 8) {
                     string.insert(0, '0');
                 }
-//                string.append(',');
                 out.println(string);
             }
-            for (int i = lastAddress + Memory.WORD_LENGTH_BYTES; i < Memory.kernelTextBaseAddress; i += Memory.WORD_LENGTH_BYTES) {
+            for (int i = lastAddress + Memory.WORD_LENGTH_BYTES; i < Memory.dataSegmentLimitAddress; i += Memory.WORD_LENGTH_BYTES) {
                 out.println("00000000");
             }
-            for (int i = Memory.kernelTextBaseAddress; i < Memory.kernelTextLimitAddress; i += Memory.WORD_LENGTH_BYTES) {
-                Integer temp = Globals.memory.getRawWordOrNull(i);
-                if (temp == null) {
-                    out.println("00000000");
-                    continue;
-                }
-                StringBuilder string = new StringBuilder(Integer.toHexString(temp));
-                while (string.length() < 8) {
-                    string.insert(0, '0');
-                }
-//                string.append(',');
-                out.println(string);
-            }
-            for (int i = 0; i < 3073; i++) {
-                out.println("00000000");
-            }
+
         }
 
     }

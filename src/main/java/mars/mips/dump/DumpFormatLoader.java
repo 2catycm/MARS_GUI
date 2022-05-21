@@ -73,7 +73,7 @@ public class DumpFormatLoader {
                     if (DumpFormat.class.isAssignableFrom(clas) &&
                             !Modifier.isAbstract(clas.getModifiers()) &&
                             !Modifier.isInterface(clas.getModifiers())) {
-                        if (formatClassName.equals("mars.mips.dump.COEHexDumpFormat")) {
+                        if (formatClassName.equals("mars.mips.dump.UARTHexDumpFormat")) {
                             formatList.add(0, clas.newInstance());
                         } else {
                             formatList.add(clas.newInstance());
