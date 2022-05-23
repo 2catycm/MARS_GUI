@@ -28,6 +28,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.intellijthemes.*;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Random;
 
 /**
  * Portal to Mars
@@ -37,8 +42,31 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
  **/
 
 public class Mars {
+    private static Class[] classes = {FlatArcDarkIJTheme.class,
+            FlatArcDarkIJTheme.class, FlatArcOrangeIJTheme.class,
+            FlatArcIJTheme.class, FlatCarbonIJTheme.class, FlatCobalt2IJTheme.class,
+            FlatCyanLightIJTheme.class, FlatDarkFlatIJTheme.class, FlatDarkPurpleIJTheme.class,
+            FlatDraculaIJTheme.class, FlatGradiantoDarkFuchsiaIJTheme.class,
+            FlatGradiantoDeepOceanIJTheme.class, FlatGradiantoMidnightBlueIJTheme.class,
+            FlatGradiantoNatureGreenIJTheme.class, FlatGrayIJTheme.class,
+            FlatGruvboxDarkHardIJTheme.class, FlatGruvboxDarkMediumIJTheme.class,
+            FlatGruvboxDarkSoftIJTheme.class, FlatHiberbeeDarkIJTheme.class,
+            FlatHighContrastIJTheme.class, FlatLightFlatIJTheme.class,
+            FlatMaterialDesignDarkIJTheme.class, FlatMonocaiIJTheme.class,
+            FlatNordIJTheme.class, FlatOneDarkIJTheme.class,
+            FlatSolarizedDarkIJTheme.class, FlatSolarizedLightIJTheme.class,
+            FlatSpacegrayIJTheme.class, FlatVuesionIJTheme.class};
+
     public static void main(String[] args) {
-        FlatIntelliJLaf.setup();
+        final var random = new Random();
+        final var i = random.nextInt(classes.length);
+        try {
+            final var setup = classes[i].getMethod("setup");
+            setup.invoke(null);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+            FlatOneDarkIJTheme.setup();
+        }
         new mars.MarsLaunch(args);
     }
 }

@@ -1,1 +1,1 @@
-C:\Users\YeCanming\.gradle\caches\modules-2\files-2.1\com.jetbrains.intellij.idea\ideaIC\2020.3.4\b86eac6c6a0550d0f4deca1e3592f7d675034e11\ideaIC-2020.3.4\plugins\maven\lib\maven3\bin\mvn.cmd package assembly:single
+mvn.cmd package assembly:single
