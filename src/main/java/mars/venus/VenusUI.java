@@ -771,6 +771,12 @@ public class VenusUI extends JFrame {
                 break;
             case FileStatus.OPENING:// This is a temporary state. DPS 9-Aug-2011
                 break;
+            case FileStatus.MODIFIED_EXTERNAL:
+                setMenuStateNotEdited();
+                break;
+            case FileStatus.MODIFIED_EXTERNAL_AND_EDITED:
+                setMenuStateConflict();
+                break;
             default:
                 System.out.println("Invalid File Status: " + status);
                 break;
@@ -1034,6 +1040,37 @@ public class VenusUI extends JFrame {
         editRedoAction.updateRedoState();
     }
 
+    void setMenuStateConflict() {
+        fileNewAction.setEnabled(true);
+        fileOpenAction.setEnabled(true);
+        fileCloseAction.setEnabled(true);
+        fileCloseAllAction.setEnabled(true);
+        fileSaveAction.setEnabled(true);
+        fileSaveAsAction.setEnabled(true);
+        fileSaveAllAction.setEnabled(true);
+        fileDumpMemoryAction.setEnabled(true);
+        filePrintAction.setEnabled(true);
+        fileExitAction.setEnabled(true);
+        editCutAction.setEnabled(true);
+        editCopyAction.setEnabled(true);
+        editPasteAction.setEnabled(true);
+        editFindReplaceAction.setEnabled(true);
+        editSelectAllAction.setEnabled(true);
+        settingsDelayedBranchingAction.setEnabled(true);
+        settingsMemoryConfigurationAction.setEnabled(true);
+        runAssembleAction.setEnabled(false);
+        runGoAction.setEnabled(false);
+        runStepAction.setEnabled(false);
+        runBackstepAction.setEnabled(false);
+        runResetAction.setEnabled(false);
+        runStopAction.setEnabled(false);
+        runPauseAction.setEnabled(false);
+        runToggleBreakpointsAction.setEnabled(false);
+        helpHelpAction.setEnabled(true);
+        helpAboutAction.setEnabled(true);
+        editUndoAction.setEnabled(true);
+        editRedoAction.setEnabled(true);
+    }
 
     /**
      * Get current menu state.  State values are constants in FileStatus class.  DPS 23 July 2008

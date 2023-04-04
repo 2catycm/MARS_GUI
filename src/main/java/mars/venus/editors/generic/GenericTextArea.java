@@ -141,6 +141,16 @@ public class GenericTextArea extends JTextArea implements MARSTextEditingArea {
         if (editable) this.requestFocusInWindow();
     }
 
+    public void updateSourceCode(String s, boolean editable) {
+        this.setText(s);
+        this.setBackground((editable) ? Color.WHITE : Color.GRAY);
+        this.setEditable(editable);
+        this.setEnabled(editable);
+        this.getCaret().setVisible(editable);
+        this.setCaretPosition(0);
+        if (editable) this.requestFocusInWindow();
+    }
+
     /**
      * Tell UndoManager to discard all its collected undoable edits.
      */

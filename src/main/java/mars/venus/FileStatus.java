@@ -76,7 +76,14 @@ public class FileStatus {
      * file is being opened.  DPS 9-Aug-2011
      */
     public static final int OPENING = 8;
-
+    /**
+     * file has been modified from external
+     */
+    public static final int MODIFIED_EXTERNAL = 9;
+    /**
+     * file has been modified from external
+     */
+    public static final int MODIFIED_EXTERNAL_AND_EDITED = 10;
 
     ///////////////////////////////////////////////////////////////////
     //                                                               //
@@ -288,7 +295,7 @@ public class FileStatus {
      * @return true if file has been modified since save or creation, false otherwise.
      */
     public boolean hasUnsavedEdits() {
-        return status == FileStatus.NEW_EDITED || status == FileStatus.EDITED;
+        return status == FileStatus.NEW_EDITED || status == FileStatus.EDITED || status == FileStatus.MODIFIED_EXTERNAL_AND_EDITED;
     }
 
     /**

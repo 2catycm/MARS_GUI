@@ -14,8 +14,8 @@ import javax.swing.text.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import java.io.*;
-	
-	/*
+
+    /*
 Copyright (c) 2003-2011,  Pete Sanderson and Kenneth Vollmar
 
 Developed by Pete Sanderson (psanderson@otterbein.edu)
@@ -94,6 +94,7 @@ public class SettingsEditorAction extends GuiAction {
     private static final String BLINK_SAMPLE_TOOL_TIP_TEXT = "Displays current blinking rate";
     private static final String CURRENT_LINE_HIGHLIGHT_TOOL_TIP_TEXT = "Check, to highlight line currently being edited";
     private static final String AUTO_INDENT_TOOL_TIP_TEXT = "Check, to enable auto-indent to previous line when Enter key is pressed";
+    private static final String AUTO_RELOAD_TOOL_TIP_TEXT = "Check, to enable auto-reload when file is changed from external";
     private static final String[] POPUP_GUIDANCE_TOOL_TIP_TEXT = {"Turns off instruction and directive guide popup while typing",
             "Generates instruction guide popup after first letter of potential instruction is typed",
             "Generates instruction guide popup after second letter of potential instruction is typed"
@@ -115,7 +116,7 @@ public class SettingsEditorAction extends GuiAction {
 
         private JSlider tabSizeSelector;
         private JSpinner tabSizeSpinSelector, blinkRateSpinSelector, popupPrefixLengthSpinSelector;
-        private JCheckBox lineHighlightCheck, genericEditorCheck, autoIndentCheck;
+        private JCheckBox lineHighlightCheck, genericEditorCheck, autoIndentCheck, autoReloadCheck;
         private Caret blinkCaret;
         private JTextField blinkSample;
         private ButtonGroup popupGuidanceButtons;
@@ -125,7 +126,7 @@ public class SettingsEditorAction extends GuiAction {
         private boolean syntaxStylesAction = false;
 
         private int initialEditorTabSize, initialCaretBlinkRate, initialPopupGuidance;
-        private boolean initialLineHighlighting, initialGenericTextEditor, initialAutoIndent;
+        private boolean initialLineHighlighting, initialGenericTextEditor, initialAutoIndent, initialAutoReload;
 
         public EditorFontDialog(Frame owner, String title, boolean modality, Font font) {
             super(owner, title, modality, font);
@@ -225,6 +226,7 @@ public class SettingsEditorAction extends GuiAction {
             Globals.getSettings().setBooleanSetting(Settings.GENERIC_TEXT_EDITOR, genericEditorCheck.isSelected());
             Globals.getSettings().setBooleanSetting(Settings.EDITOR_CURRENT_LINE_HIGHLIGHTING, lineHighlightCheck.isSelected());
             Globals.getSettings().setBooleanSetting(Settings.AUTO_INDENT, autoIndentCheck.isSelected());
+            Globals.getSettings().setBooleanSetting(Settings.AUTO_RELOAD, autoReloadCheck.isSelected());
             Globals.getSettings().setCaretBlinkRate(((Integer) blinkRateSpinSelector.getValue()).intValue());
             Globals.getSettings().setEditorTabSize(tabSizeSelector.getValue());
             if (syntaxStylesAction) {
@@ -265,6 +267,7 @@ public class SettingsEditorAction extends GuiAction {
             tabSizeSpinSelector.setValue(new Integer(initialEditorTabSize));
             lineHighlightCheck.setSelected(initialLineHighlighting);
             autoIndentCheck.setSelected(initialAutoIndent);
+            autoReloadCheck.setSelected(initialAutoReload);
             blinkRateSpinSelector.setValue(new Integer(initialCaretBlinkRate));
             blinkCaret.setBlinkRate(initialCaretBlinkRate);
             popupGuidanceOptions[initialPopupGuidance].setSelected(true);
@@ -308,6 +311,12 @@ public class SettingsEditorAction extends GuiAction {
             autoIndentCheck.setSelected(initialAutoIndent);
             autoIndentCheck.setToolTipText(AUTO_INDENT_TOOL_TIP_TEXT);
 
+            // auto-reload
+            initialAutoReload = Globals.getSettings().getBooleanSetting(Settings.AUTO_RELOAD);
+            autoReloadCheck = new JCheckBox("Auto-Reload");
+            autoReloadCheck.setSelected(initialAutoReload);
+            autoReloadCheck.setToolTipText(AUTO_RELOAD_TOOL_TIP_TEXT);
+
             // cursor blink rate selector
             initialCaretBlinkRate = Globals.getSettings().getCaretBlinkRate();
             blinkSample = new JTextField("     ");
@@ -341,11 +350,12 @@ public class SettingsEditorAction extends GuiAction {
             blinkPanel.add(blinkSample);
 
             otherSettingsPanel.setLayout(new GridLayout(1, 2));
-            JPanel leftColumnSettingsPanel = new JPanel(new GridLayout(4, 1));
+            JPanel leftColumnSettingsPanel = new JPanel(new GridLayout(5, 1));
             leftColumnSettingsPanel.add(tabPanel);
             leftColumnSettingsPanel.add(blinkPanel);
             leftColumnSettingsPanel.add(lineHighlightCheck);
             leftColumnSettingsPanel.add(autoIndentCheck);
+            leftColumnSettingsPanel.add(autoReloadCheck);
 
             // Combine instruction guide off/on and instruction prefix length into radio buttons
             JPanel rightColumnSettingsPanel = new JPanel(new GridLayout(4, 1));

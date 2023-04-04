@@ -56,6 +56,7 @@ public class EditTabbedPane extends JTabbedPane {
     private VenusUI mainUI;
     private Editor editor;
     private FileOpener fileOpener;
+    private FileReloader fileReloader;
 
     /**
      * Constructor for the EditTabbedPane class.
@@ -66,6 +67,8 @@ public class EditTabbedPane extends JTabbedPane {
         this.mainUI = appFrame;
         this.editor = editor;
         this.fileOpener = new FileOpener(editor);
+        this.fileReloader = new FileReloader(this);
+        fileReloader.start();
         this.mainPane = mainPane;
         this.editor.setEditTabbedPane(this);
         this.addChangeListener(
@@ -180,6 +183,9 @@ public class EditTabbedPane extends JTabbedPane {
         return fileOpener.openFile(file);
     }
 
+    public void reloadEditPane(EditPane pane) {
+        fileOpener.reloadEditPane(pane);
+    }
 
     /**
      * Carries out all necessary operations to implement
@@ -288,6 +294,29 @@ public class EditTabbedPane extends JTabbedPane {
                     editPane.setPathname(theFile.getPath());
                 }
                 return (theFile != null);
+            }
+            if (editPane.getFileStatus() == FileStatus.MODIFIED_EXTERNAL_AND_EDITED) {
+                int overwrite = JOptionPane.showConfirmDialog(mainUI,
+                        "File has been modified from external.  Do you wish to overwrite it with your changes?",
+                        "Overwrite file?",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                switch (overwrite) {
+                    case JOptionPane.YES_OPTION:
+                        File theFile = new File(editPane.getPathname());
+                        try {
+                            BufferedWriter outFileStream = new BufferedWriter(new FileWriter(theFile));
+                            outFileStream.write(editPane.getSource(), 0, editPane.getSource().length());
+                            outFileStream.close();
+                        } catch (java.io.IOException c) {
+                            JOptionPane.showMessageDialog(null,
+                                    "Save operation could not be completed due to an error:\n" + c,
+                                    "Save Operation Failed", JOptionPane.ERROR_MESSAGE);
+                            return false;
+                        }
+                        return true;
+                    case JOptionPane.NO_OPTION:
+                        return false;
+                }
             }
             File theFile = new File(editPane.getPathname());
             try {
@@ -435,7 +464,6 @@ public class EditTabbedPane extends JTabbedPane {
         return result;
     }
 
-
     /**
      * Remove the pane and update menu status
      */
@@ -472,6 +500,11 @@ public class EditTabbedPane extends JTabbedPane {
         boolean assembled = FileStatus.isAssembled();
         editPane.updateStaticFileStatus(); //  for legacy code that depends on the static FileStatus (pre 4.0)
         FileStatus.setAssembled(assembled);
+    }
+
+    private void initContent(EditPane editPane, File theFile) {
+        editPane.setContent(theFile);
+        editPane.updateLastModifiedTime();
     }
 
     /**
@@ -602,6 +635,8 @@ public class EditTabbedPane extends JTabbedPane {
             } else {
                 editPane = new EditPane(mainUI);
             }
+
+            initContent(editPane, theFile);
             editPane.setPathname(currentFilePath);
             //FileStatus.reset();
             FileStatus.setName(currentFilePath);
@@ -654,6 +689,63 @@ public class EditTabbedPane extends JTabbedPane {
                 mostRecentlyOpenedFile = theFile;
             }
             return true;
+        }
+
+        private void reloadEditPane(EditPane editPane) {// TODO
+            File content = editPane.getContent();
+            String currentFilePath = content.getPath();
+            // If this file is currently already open, then simply select its tab
+
+            initContent(editPane, content);
+            // editPane.setPathname(currentFilePath);
+            // FileStatus.reset();
+            // FileStatus.setName(currentFilePath);
+            // FileStatus.setFile(content);
+            // FileStatus.set(FileStatus.OPENING);// DPS 9-Aug-2011
+            if (content.canRead()) {
+                Globals.program = new MIPSprogram();
+                try {
+                    Globals.program.readSource(currentFilePath);
+                } catch (ProcessingException pe) {
+                }
+
+                StringBuffer fileContents = new StringBuffer((int) content.length());
+                int lineNumber = 1;
+                String line = Globals.program.getSourceLine(lineNumber++);
+                while (line != null) {
+                    fileContents.append(line + "\n");
+                    line = Globals.program.getSourceLine(lineNumber++);
+                }
+                editPane.updateSourceCode(fileContents.toString(), true);
+                // The above operation generates an undoable edit, setting the initial
+                // text area contents, that should not be seen as undoable by the Undo
+                // action. Let's get rid of it.
+                editPane.discardAllUndoableEdits();
+                editPane.setShowLineNumbersEnabled(true);
+                editPane.updatePane(FileStatus.NOT_EDITED);
+
+                // addTab(editPane.getFilename(), editPane);
+                // setToolTipTextAt(indexOfComponent(editPane), editPane.getPathname());
+                // setSelectedComponent(editPane);
+                // FileStatus.setSaved(true);
+                // FileStatus.setEdited(false);
+                // FileStatus.set(FileStatus.NOT_EDITED);
+
+                // If assemble-all, then allow opening of any file w/o invalidating assembly.
+                // DPS 9-Aug-2011
+                // if
+                // (Globals.getSettings().getBooleanSetting(mars.Settings.ASSEMBLE_ALL_ENABLED))
+                // {
+                // updateTitles(editPane);
+                // } else {// this was the original code...
+                // updateTitlesAndMenuState(editPane);
+                // mainPane.getExecutePane().clearPane();
+                // }
+
+                // mainPane.setSelectedComponent(EditTabbedPane.this);
+                // editPane.tellEditingComponentToRequestFocusInWindow();
+                // mostRecentlyOpenedFile = theFile;
+            }
         }
 
         // Private method to generate the file chooser's list of choosable file filters.
@@ -717,7 +809,65 @@ public class EditTabbedPane extends JTabbedPane {
             }
         }
 
+    }
 
+    private class FileReloader implements Runnable {
+        private Thread t;
+        private String threadName = "FileReloader";
+        private EditTabbedPane editTabbedPane;
+
+        public FileReloader(EditTabbedPane tabs) {
+            editTabbedPane = tabs;
+        }
+
+        @Override
+        public void run() {
+            try {
+                EditPane checked, curSelected;
+                int curIndex;
+                boolean hadReloaded;
+                while (true) {
+                    if (Globals.getSettings().getAutoReloadEnabled()) {
+                        hadReloaded = false;
+                        curSelected = editTabbedPane.getCurrentEditTab();
+                        curIndex = editTabbedPane.getSelectedIndex();
+                        for (int i = 0; i < editTabbedPane.getTabCount(); ++i) {
+                            checked = (EditPane) editTabbedPane.getComponentAt(i);
+                            if (checked == null) {
+                                continue;
+                            }
+                            long before = checked.getLastModifiedTime();
+                            checked.updateLastModifiedTime();
+                            if (checked.getLastModifiedTime() > before) {
+                                if (checked.getFileStatus() == FileStatus.MODIFIED_EXTERNAL_AND_EDITED) {
+                                    continue;
+                                } else if (checked.getFileStatus() == FileStatus.EDITED) {
+                                    checked.updatePane(FileStatus.MODIFIED_EXTERNAL_AND_EDITED);
+                                } else {
+                                    checked.updatePane(FileStatus.MODIFIED_EXTERNAL);
+                                }
+                            }
+                            if (checked.getFileStatus() == FileStatus.MODIFIED_EXTERNAL) {
+                                editTabbedPane.reloadEditPane(checked);
+                                hadReloaded = true;
+                            }
+                        }
+                        if (hadReloaded)
+                            editTabbedPane.setTitleAt(curIndex, curSelected.getFilename());
+                    }
+                    Thread.sleep(250);
+                }
+            } catch (Exception e) {
+                t.start();
+            }
+        }
+
+        private void start() {
+            if (t == null) {
+                t = new Thread(this, threadName);
+                t.start();
+            }
+        }
     }
 
 }
