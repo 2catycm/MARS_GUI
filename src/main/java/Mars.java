@@ -62,6 +62,7 @@ public class Mars {
         final var i = random.nextInt(classes.length);
         try {
             final var setup = classes[i].getMethod("setup");
+//            final var setup=FlatCyanLightIJTheme.class.getMethod("setup");
             setup.invoke(null);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
