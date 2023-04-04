@@ -56,6 +56,7 @@ public class EditPane extends JPanel implements Observer {
     private MARSTextEditingArea sourceCode;
     private VenusUI mainUI;
     private String currentDirectoryPath;
+    private File content;
     private JLabel caretPositionLabel;
     private JCheckBox showLineNumbers;
     private JLabel lineNumbers;
@@ -63,6 +64,7 @@ public class EditPane extends JPanel implements Observer {
     private boolean isCompoundEdit = false;
     private CompoundEdit compoundEdit;
     private FileStatus fileStatus;
+    private long lastModifiedTime;
 
     /**
      * Constructor for the EditPane class.
@@ -115,6 +117,10 @@ public class EditPane extends JPanel implements Observer {
                         } else {
                             mainUI.editor.setTitle(getPathname(), getFilename(), getFileStatus());
                         }
+                        if (getFileStatus() == FileStatus.MODIFIED_EXTERNAL) {
+                            setFileStatus(FileStatus.MODIFIED_EXTERNAL_AND_EDITED);
+                            mainUI.editor.setTitle(getPathname(), getFilename(), getFileStatus());
+                        }
 
                         FileStatus.setEdited(true);
                         switch (FileStatus.get()) {
@@ -122,6 +128,8 @@ public class EditPane extends JPanel implements Observer {
                                 FileStatus.set(FileStatus.NEW_EDITED);
                                 break;
                             case FileStatus.NEW_EDITED:
+                                break;
+                            case FileStatus.MODIFIED_EXTERNAL_AND_EDITED:
                                 break;
                             default:
                                 FileStatus.set(FileStatus.EDITED);
@@ -194,6 +202,15 @@ public class EditPane extends JPanel implements Observer {
 
     public void setSourceCode(String s, boolean editable) {
         sourceCode.setSourceCode(s, editable);
+    }
+
+    public void updateSourceCode(String s, boolean editable) {
+        sourceCode.updateSourceCode(s, editable);
+    }
+
+    public void updatePane(int fileStatus) {
+        setFileStatus(fileStatus);
+        mainUI.editor.setTitle(getPathname(), getFilename(), getFileStatus());
     }
 
     /**
@@ -302,6 +319,13 @@ public class EditPane extends JPanel implements Observer {
         return this.fileStatus.getPathname();
     }
 
+    public File getContent() {
+        return content;
+    }
+
+    public long getLastModifiedTime() {
+        return lastModifiedTime;
+    }
 
     /**
      * Delegates to corresponding FileStatus method
@@ -422,6 +446,14 @@ public class EditPane extends JPanel implements Observer {
      */
     public void updateRedoState() {
         mainUI.editRedoAction.updateRedoState();
+    }
+
+    public void setContent(File content) {
+        this.content = content;
+    }
+
+    public void updateLastModifiedTime() {
+        lastModifiedTime = content.lastModified();
     }
 
     /**

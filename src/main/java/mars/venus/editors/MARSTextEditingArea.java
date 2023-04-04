@@ -108,6 +108,8 @@ public interface MARSTextEditingArea {
 
     public void setSourceCode(String code, boolean editable);
 
+    public void updateSourceCode(String code, boolean editable);
+
     public void setCaretVisible(boolean vis);
 
     public void setSelectionVisible(boolean vis);

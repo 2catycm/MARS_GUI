@@ -155,6 +155,10 @@ public class Settings extends Observable {
      * execute that code.
      */
     public static final int SELF_MODIFYING_CODE_ENABLED = 20;
+    /**
+     * Flag to control whether reload file when it changed from external with no unsaved chang in Mars editor
+     */
+    public static final int AUTO_RELOAD = 21;//TODO
 
     // NOTE: key sequence must match up with labels above which are used for array indexes!
     private static String[] booleanSettingsKeys = {"ExtendedAssembler", "BareMachine", "AssembleOnOpen", "AssembleAll",
@@ -163,7 +167,7 @@ public class Settings extends Observable {
             "WarningsAreErrors", "ProgramArguments", "DataSegmentHighlighting",
             "RegistersHighlighting", "StartAtMain", "EditorCurrentLineHighlighting",
             "PopupInstructionGuidance", "PopupSyscallInput", "GenericTextEditor",
-            "AutoIndent", "SelfModifyingCode"};
+            "AutoIndent", "SelfModifyingCode", "AutoReload"};
 
     /**
      * Last resort default values for boolean settings; will use only  if neither
@@ -173,7 +177,7 @@ public class Settings extends Observable {
      */
     public static boolean[] defaultBooleanSettingsValues = { // match the above list by position
             true, false, false, false, false, true, true, false, false,
-            true, false, false, true, true, false, true, true, false, false, true, false};
+            true, false, false, true, true, false, true, true, false, false, true, false, true};
 
     // STRING SETTINGS.  Each array position has associated name.
     /**
@@ -638,6 +642,17 @@ public class Settings extends Observable {
      */
     public boolean getDelayedBranchingEnabled() {
         return booleanSettingsValues[DELAYED_BRANCHING_ENABLED];
+    }
+
+    /**
+     * Setting for whether auto reload file when file who is in no-edited status
+     * If enabled, you opened files who is in no-edited status will reload when
+     * external modification is detected.
+     *
+     * @return true if auto reload is enabled, false otherwise.
+     */
+    public boolean getAutoReloadEnabled() {
+        return booleanSettingsValues[AUTO_RELOAD];
     }
 
     /**

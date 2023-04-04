@@ -172,7 +172,18 @@ public class Editor {
         if (status == FileStatus.NO_FILE || name == null || name.length() == 0) {
             mainUI.setTitle(mainUIbaseTitle);
         } else {
-            String edited = (status == FileStatus.NEW_EDITED || status == FileStatus.EDITED) ? "*" : " ";
+            String edited;
+            switch (status) {
+                case FileStatus.NEW_EDITED:
+                case FileStatus.EDITED:
+                    edited = "*";
+                    break;
+                case FileStatus.MODIFIED_EXTERNAL_AND_EDITED:
+                    edited = "~";
+                    break;
+                default:
+                    edited = " ";
+            }
             String titleName = (status == FileStatus.NEW_EDITED || status == FileStatus.NEW_NOT_EDITED) ? name : path;
             mainUI.setTitle(titleName + edited + " - " + mainUIbaseTitle);
             editTabbedPane.setTitleAt(editTabbedPane.getSelectedIndex(), name + edited);

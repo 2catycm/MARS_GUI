@@ -180,6 +180,15 @@ public class JEditBasedTextArea extends JEditTextArea implements MARSTextEditing
         if (editable) this.requestFocusInWindow();
     }
 
+    public void updateSourceCode(String s, boolean editable) {
+        this.setText(s);
+        this.setBackground((editable) ? Color.WHITE : Color.GRAY);
+        this.setEditable(editable);
+        this.setEnabled(editable);
+        //this.getCaret().setVisible(editable);
+        this.setCaretPosition(0);
+    }
+
     /**
      * Returns the undo manager for this editing area
      *
