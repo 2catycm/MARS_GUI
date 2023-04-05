@@ -14,8 +14,8 @@ import java.util.*;
 import java.io.*;
 import java.beans.PropertyChangeListener;
 import javax.swing.filechooser.FileFilter;
-		
-	/*
+
+    /*
 Copyright (c) 2003-2010,  Pete Sanderson and Kenneth Vollmar
 
 Developed by Pete Sanderson (psanderson@otterbein.edu)
@@ -691,17 +691,12 @@ public class EditTabbedPane extends JTabbedPane {
             return true;
         }
 
-        private void reloadEditPane(EditPane editPane) {// TODO
+        // reload edit pane after reload file
+        private void reloadEditPane(EditPane editPane) {
             File content = editPane.getContent();
             String currentFilePath = content.getPath();
-            // If this file is currently already open, then simply select its tab
-
             initContent(editPane, content);
-            // editPane.setPathname(currentFilePath);
-            // FileStatus.reset();
-            // FileStatus.setName(currentFilePath);
-            // FileStatus.setFile(content);
-            // FileStatus.set(FileStatus.OPENING);// DPS 9-Aug-2011
+
             if (content.canRead()) {
                 Globals.program = new MIPSprogram();
                 try {
@@ -717,34 +712,10 @@ public class EditTabbedPane extends JTabbedPane {
                     line = Globals.program.getSourceLine(lineNumber++);
                 }
                 editPane.updateSourceCode(fileContents.toString(), true);
-                // The above operation generates an undoable edit, setting the initial
-                // text area contents, that should not be seen as undoable by the Undo
-                // action. Let's get rid of it.
+
                 editPane.discardAllUndoableEdits();
                 editPane.setShowLineNumbersEnabled(true);
                 editPane.updatePane(FileStatus.NOT_EDITED);
-
-                // addTab(editPane.getFilename(), editPane);
-                // setToolTipTextAt(indexOfComponent(editPane), editPane.getPathname());
-                // setSelectedComponent(editPane);
-                // FileStatus.setSaved(true);
-                // FileStatus.setEdited(false);
-                // FileStatus.set(FileStatus.NOT_EDITED);
-
-                // If assemble-all, then allow opening of any file w/o invalidating assembly.
-                // DPS 9-Aug-2011
-                // if
-                // (Globals.getSettings().getBooleanSetting(mars.Settings.ASSEMBLE_ALL_ENABLED))
-                // {
-                // updateTitles(editPane);
-                // } else {// this was the original code...
-                // updateTitlesAndMenuState(editPane);
-                // mainPane.getExecutePane().clearPane();
-                // }
-
-                // mainPane.setSelectedComponent(EditTabbedPane.this);
-                // editPane.tellEditingComponentToRequestFocusInWindow();
-                // mostRecentlyOpenedFile = theFile;
             }
         }
 

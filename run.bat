@@ -1,1 +1,1 @@
-javaw.exe "-Dfile.encoding=utf-8" -jar target\MARS_GUI-1.0-SNAPSHOT-jar-with-dependencies.jar
+javaw.exe "-Dfile.encoding=utf-8" -jar target\MARS_GUI-1.1-SNAPSHOT-jar-with-dependencies.jar

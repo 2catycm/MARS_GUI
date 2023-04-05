@@ -7,3 +7,9 @@
 dump之前需要去settings-memory conf里把选项改成compact, text at address 0。
 
 受mars的限制，不支持同时把.data导出在0x0，需要导出时换选项。
+
+## Version 1.1 更新
+
+增加了文件自动重载功能，检测到外部修改时，Mars会自动重载所有打开且没有未保存修改的文件(若要关闭，请取消勾选editor选项里的Auto-Reload选项)
+
+增加了shell脚本用于Linux下打包和运行
