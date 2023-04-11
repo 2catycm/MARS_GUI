@@ -829,6 +829,8 @@ public class EditTabbedPane extends JTabbedPane {
                     Thread.sleep(250);
                 }
             } catch (Exception e) {
+                System.err.println(e);
+                t = new Thread(this, threadName);
                 t.start();
             }
         }
