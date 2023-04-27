@@ -158,7 +158,7 @@ public class Settings extends Observable {
     /**
      * Flag to control whether reload file when it changed from external with no unsaved chang in Mars editor
      */
-    public static final int AUTO_RELOAD = 21;//TODO
+    public static final int AUTO_RELOAD = 21;
 
     // NOTE: key sequence must match up with labels above which are used for array indexes!
     private static String[] booleanSettingsKeys = {"ExtendedAssembler", "BareMachine", "AssembleOnOpen", "AssembleAll",

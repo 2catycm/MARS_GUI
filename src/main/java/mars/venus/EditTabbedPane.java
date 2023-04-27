@@ -826,9 +826,11 @@ public class EditTabbedPane extends JTabbedPane {
                         if (hadReloaded)
                             editTabbedPane.setTitleAt(curIndex, curSelected.getFilename());
                     }
-                    Thread.sleep(250);
+                    Thread.sleep(100);
                 }
             } catch (Exception e) {
+                System.err.println(e);
+                t = new Thread(this, threadName);
                 t.start();
             }
         }
